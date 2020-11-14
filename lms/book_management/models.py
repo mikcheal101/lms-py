@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User as Staff
 from django.contrib.auth.models import User as Customer
 
 
@@ -22,6 +23,11 @@ class Issue(models.Model):
     Issue Model
     table holding the book's issue
     """
+
+    staff = models.ForeignKey(
+        to=Staff,
+        related_name='leases',
+        on_delete=models.CASCADE)
 
     customer = models.ForeignKey(
         to=Customer,
