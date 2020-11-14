@@ -44,6 +44,16 @@ class Issue(models.Model):
     return_date = models.DateField(blank=True, null=True)
     fine = models.FloatField(default=0.00)
 
+    def close_issue(self, returned_date, fine_per_day):
+        """ an issue is closed by returning a book. """
+
+        days_spent = 0
+        if returned_date > self.expected_date:
+            days_spent = (returned_date - self.expected_date).days
+
+        self.fine = fine_per_day * days_spent
+        self.return_date = returned_date
+
     def __repr__(self):
         pass
 
