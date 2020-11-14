@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.contrib.auth.models import User as Staff
-from django.contrib.auth.models import User as Customer
 from django.contrib.auth import authenticate
 
 
@@ -34,61 +33,6 @@ class SigninTest(TestCase):
             username="sambo-hameed",
             password="password10")
         self.assertFalse((user is not None) and user.is_authenticated)
-
-
-class UserTest(TestCase):
-    def setUp(self):
-        pass
-
-    def test_can_login(self):
-        pass
-
-    def test_can_logout(self):
-        pass
-
-
-class AdminTest(TestCase):
-
-    def setUp(self):
-        self.administrator = Staff.objects.create_user(
-            username="sambo-hameed",
-            password="password101",
-            email="sambo-hameed@mail.com",
-            is_staff=True,
-            is_superuser=True,
-            is_active=True)
-        self.administrator.save()
-
-    def test_can_create_user(self):
-        user = dict(
-            username="musa",
-            email="musa@mail.com",
-            password="password101",
-            is_staff=True,
-            is_active=True)
-
-    def test_can_delete_user(self):
-        pass
-
-    def test_can_add_book(self):
-        pass
-
-    def test_can_delete_book(self):
-        pass
-
-    def test_can_update_book(self):
-        pass
-
-
-class StaffTest(TestCase):
-    def setUp(self):
-        pass
-
-    def test_can_lease_book(self):
-        pass
-
-    def test_can_return_book(self):
-        pass
 
 
 class SigninViewTest(TestCase):
