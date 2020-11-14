@@ -4,6 +4,49 @@ from book_management.models import Book, Issue
 from django.contrib.auth.models import User as Customer
 
 
+class UserTest(TestCase):
+    def setUp(self):
+        pass
+
+    def test_can_login(self):
+        pass
+
+    def test_can_logout(self):
+        pass
+
+
+class AdminTest(TestCase):
+
+    def setUp(self):
+        pass
+
+    def test_can_create_user(self):
+        pass
+
+    def test_can_delete_user(self):
+        pass
+
+    def test_can_add_book(self):
+        pass
+
+    def test_can_delete_book(self):
+        pass
+
+    def test_can_update_book(self):
+        pass
+
+
+class StaffTest(TestCase):
+    def setUp(self):
+        pass
+
+    def test_can_lease_book(self):
+        pass
+
+    def test_can_return_book(self):
+        pass
+
+
 class BookTestCase(TestCase):
     def setUp(self):
 
