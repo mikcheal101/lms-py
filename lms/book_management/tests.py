@@ -1,108 +1,137 @@
 import datetime as dt
 from django.test import TestCase
 from book_management.models import Book, Issue
+from django.contrib.auth.models import User as Staff
 from django.contrib.auth.models import User as Customer
 
 
-class UserTest(TestCase):
+class BookTest(TestCase):
     def setUp(self):
-        pass
+        self.price = 120.00
+        self.genre = "folk tale".title()
+        self.name = "harry potter".title()
+        self.book = Book(
+            price=self.price,
+            genre=self.genre,
+            name=self.name)
+        self.book.save()
 
-    def test_can_login(self):
-        pass
+    def tearDown(self):
+        self.book.delete()
 
-    def test_can_logout(self):
-        pass
+    def test_read_book(self):
+        self.assertEqual(self.name, "harry potter".title())
+        self.assertEqual(self.price, 120.00)
+        self.assertEqual(self.genre, "folk tale".title())
+
+    def test_update_name(self):
+        self.book.name = "new name".title()
+        self.book.save()
+        self.assertEqual(self.book.name, "new name".title())
+
+    def test_update_price(self):
+        self.book.price = 110.00
+        self.book.save()
+        self.assertEqual(self.book.price, 110.00)
+
+    def test_update_genre(self):
+        self.book.genre = "new genre".title()
+        self.book.save()
+        self.assertEqual(self.book.genre, "new genre".title())
 
 
-class AdminTest(TestCase):
-
+class IssueTest(TestCase):
     def setUp(self):
-        pass
+        self.fine_per_day = 100.00
 
-    def test_can_create_user(self):
-        pass
+        self.staff = Staff.objects.create_user(
+            username="staff00001",
+            email="staff00001@mail.com",
+            password="password101",
+            is_staff=True,
+            is_superuser=True,
+            is_active=True)
+        self.staff.save()
 
-    def test_can_delete_user(self):
-        pass
-
-    def test_can_add_book(self):
-        pass
-
-    def test_can_delete_book(self):
-        pass
-
-    def test_can_update_book(self):
-        pass
-
-
-class StaffTest(TestCase):
-    def setUp(self):
-        pass
-
-    def test_can_lease_book(self):
-        pass
-
-    def test_can_return_book(self):
-        pass
-
-
-class BookTestCase(TestCase):
-    def setUp(self):
-
-        Customer.objects.create_user(
-            email="calistus@samplemail.com",
-            username="calistus",
+        self.customer = Customer.objects.create_user(
+            username="mohammed",
+            email="mohammed@mail.com",
             password="password101",
             is_active=True)
-        """ create a sample customer """
+        self.customer.save()
 
-        _ = [
-            Book.objects.create(
+        self.pre_book = Book.objects.create(
                 price=120.00,
-                genre="history",
-                name="sambisa books vol.{index}".title())
-            for index, value in enumerate(range(1, 4))]
-        """ create three sample books """
+                genre="folk tale".title(),
+                name="harry potter".title())
+        self.post_book = Book.objects.create(
+                price=150.00,
+                genre="folk tale".title(),
+                name="the story of mallam ilia".title())
 
-    def test_can_be_borrowed(self):
-        """ test if book can be borrowed """
-
-        customer = Customer.objects.get(username="calistus")
-        book = Book.objects.get(pk=1)
-        today = dt.date.today()
-        issue_date = today - dt.timedelta(10)
-        expected_date = issue_date + dt.timedelta(5)
+        self.return_date = dt.date.today()
+        self.issue_date = self.return_date - dt.timedelta(10)
+        self.expected_date = self.issue_date + dt.timedelta(5)
         """ 5 days to return the book """
 
-        issue = Issue.objects.create(
-            customer=customer,
-            book=book,
-            issue_date=issue_date,
-            expected_date=expected_date)
+        self.fine = 0.00
+        if self.return_date > self.expected_date:
+            self.fine = (self.return_date - self.expected_date).days
+        self.fine = self.fine_per_day * self.fine
 
-        self.assertFalse(issue is None)
+        self.pre_issue = Issue.objects.create(
+            book=self.pre_book,
+            staff=self.staff,
+            issue_date=self.issue_date,
+            customer=self.customer,
+            expected_date=self.expected_date)
+        self.pre_issue.save()
 
-    def test_can_be_returned(self):
-        """ test if book can be borrowed """
+        self.post_issue = Issue.objects.create(
+            book=self.post_book,
+            staff=self.staff,
+            issue_date=self.issue_date,
+            customer=self.customer,
+            expected_date=self.expected_date)
 
-        customer = Customer.objects.get(username="calistus")
-        book = Book.objects.get(pk=1)
-        return_date = dt.date.today()
-        issue_date = return_date - dt.timedelta(10)
-        expected_date = issue_date + dt.timedelta(5)
-        """ 5 days to return the book """
+        self.post_issue.close_issue(
+            returned_date=self.return_date,
+            fine_per_day=self.fine_per_day)
+        self.post_issue.save()
 
-        fine = 0.00
-        if return_date > expected_date:
-            fine = 100.00 * (return_date - expected_date).days
+    def tearDown(self):
+        self.pre_book.delete()
+        self.post_book.delete()
+        self.staff.delete()
+        self.customer.delete()
+        self.pre_issue.delete()
+        self.post_issue.delete()
 
-        issue = Issue.objects.create(
-            customer=customer,
-            book=book,
-            issue_date=issue_date,
-            return_date=return_date,
-            expected_date=expected_date,
-            fine=fine)
+    def test_read_pre_issue(self):
+        self.assertEqual(self.pre_issue.book, self.pre_book)
+        self.assertEqual(self.pre_issue.staff, self.staff)
+        self.assertEqual(self.pre_issue.customer, self.customer)
+        self.assertEqual(self.pre_issue.issue_date, self.issue_date)
+        self.assertEqual(self.pre_issue.expected_date, self.expected_date)
 
-        self.assertEqual(issue.fine, 500.00)
+    def test_read_post_issue(self):
+        self.assertEqual(self.post_issue.book, self.post_book)
+        self.assertEqual(self.post_issue.staff, self.staff)
+        self.assertEqual(self.post_issue.customer, self.customer)
+        self.assertEqual(self.post_issue.issue_date, self.issue_date)
+        self.assertEqual(self.post_issue.expected_date, self.expected_date)
+        self.assertEqual(self.post_issue.fine, self.fine)
+        self.assertEqual(self.post_issue.return_date, self.return_date)
+
+    def test_return_book(self):
+        self.pre_issue.close_issue(
+            fine_per_day=self.fine_per_day,
+            returned_date=self.return_date)
+        self.pre_issue.save()
+
+        self.assertEqual(
+            self.pre_issue.fine,
+            self.fine)
+        self.assertEqual(
+            self.pre_issue.return_date,
+            self.return_date)
