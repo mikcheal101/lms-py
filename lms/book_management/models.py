@@ -34,11 +34,9 @@ class Issue(models.Model):
         on_delete=models.CASCADE)
 
     issue_date = models.DateField()
-    return_date = models.DateField()
-
-    period = models.IntegerField(default=1)
-    fine = models.FloatField(default=100.00)
-    """ fine per day """
+    expected_date = models.DateField(default=1)
+    return_date = models.DateField(blank=True, null=True)
+    fine = models.FloatField(default=0.00)
 
     def __repr__(self):
         pass
