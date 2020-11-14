@@ -1,3 +1,5 @@
 from django.contrib import admin
+from book_management.models import Book, Issue
 
-# Register your models here.
+admin.register.site(Book)
+admin.register.site(Issue)
