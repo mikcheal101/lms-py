@@ -22,10 +22,8 @@ class IssueForm(forms.ModelForm):
             'expected_date',
             'return_date',
             'fine',
-            'customer_id',
             'customer',
-            'book',
-            'book_id', ]
+            'book', ]
 
 
 class BookForm(forms.ModelForm):
