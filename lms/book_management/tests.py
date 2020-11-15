@@ -59,7 +59,7 @@ class BookViewTest(TestCase):
         self.assertEqual(response.data, {'books', []})
 
     def test_read_book(self):
-        response = self.client.get(f'/book/{self.book.id}/')
+        response = self.client.get(f'/books/{self.book.id}/')
         book = response.data['book']
 
         self.assertEqual(self.name, book.name)
@@ -72,7 +72,7 @@ class BookViewTest(TestCase):
             price=self.price,
             genre=self.genre)
 
-        response = self.client.put(f'/book/{self.book.id}/', book)
+        response = self.client.put(f'/books/{self.book.id}/', book)
         book = response.data['book']
         self.assertEqual(self.book.name, book.name)
 
@@ -82,7 +82,7 @@ class BookViewTest(TestCase):
             price=110.00,
             genre=self.genre)
 
-        response = self.client.put(f'/book/{self.book.id}/', book)
+        response = self.client.put(f'/books/{self.book.id}/', book)
         book = response.data['book']
         self.assertEqual(self.book.price, book.price)
 
@@ -92,7 +92,7 @@ class BookViewTest(TestCase):
             price=self.price,
             genre="new genre".title())
 
-        response = self.client.put(f'/book/{self.book.id}/', book)
+        response = self.client.put(f'/books/{self.book.id}/', book)
         book = response.data['book']
         self.assertEqual(self.book.genre, book.genre)
 

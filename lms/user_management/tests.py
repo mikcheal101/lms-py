@@ -51,17 +51,17 @@ class SigninViewTest(TestCase):
     def test_correct(self):
         payload = dict(username="sambo-hameed", password="password101")
         response = self.client.post(
-            'authentication/login', payload)
+            'authentication/login/', payload)
         self.assertTrue(response.data['authenticated'])
 
     def test_wrong_username(self):
         payload = dict(username="sambo-hamed", password="password101")
         response = self.client.post(
-            'authentication/login', payload)
+            'authentication/login/', payload)
         self.assertFalse(response.data['authenticated'])
 
     def test_wrong_password(self):
         payload = dict(username="sambo-hameed", password="password10")
         response = self.client.post(
-            'authentication/login', payload)
+            'authentication/login/', payload)
         self.assertFalse(response.data['authenticated'])
