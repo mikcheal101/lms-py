@@ -53,13 +53,14 @@
           aria-haspopup="true"
           aria-expanded="false"
         >
-          Staff Management
+          User Management
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          {% comment %}
           <a class="dropdown-item" href="{% url 'add-staff' %}">Add Staff</a>
           <a class="dropdown-item" href="{% url 'view-staff' %}">View Staff</a>
-          {% endcomment %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'add-customer' %}">Add Customer</a>
+          <a class="dropdown-item" href="{% url 'view-customers' %}">View Customers</a>
         </div>
       </li>
     </ul>
