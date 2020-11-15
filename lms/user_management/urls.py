@@ -35,3 +35,6 @@ urlpatterns = [
         view=pages.logout,
         name='logout')
 ]
+
+
+
