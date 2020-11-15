@@ -1,6 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User as Staff
+import datetime as dt
+
 from django.contrib.auth.models import User as Customer
+from django.contrib.auth.models import User as Staff
+from django.db import models
 
 
 class Book(models.Model):
@@ -43,19 +45,41 @@ class Issue(models.Model):
         on_delete=models.CASCADE)
 
     issue_date = models.DateField()
-    expected_date = models.DateField(default=1)
+    expected_date = models.DateField()
     return_date = models.DateField(blank=True, null=True)
     fine = models.FloatField(default=0.00)
 
-    def close_issue(self, returned_date, fine_per_day):
+    def close_issue(self, returned_date):
         """ an issue is closed by returning a book. """
 
         days_spent = 0
         if returned_date > self.expected_date:
             days_spent = (returned_date - self.expected_date).days
 
-        self.fine = fine_per_day * days_spent
+        self.fine = self.price * 0.1
+        self.fine = self.fine * days_spent
         self.return_date = returned_date
+
+    @property
+    def current_fine(self):
+        return_date = self.return_date
+        fine = 0
+        price = 0
+
+        if return_date is None:
+            return_date = dt.date.today()
+
+        days_spent = 0
+        if return_date > self.expected_date:
+            days_spent = (return_date - self.expected_date).days
+
+        try:
+            price = self.book.price
+        except Exception:
+            pass
+
+        fine = price * 0.1
+        return fine * days_spent
 
     def __repr__(self):
         pass

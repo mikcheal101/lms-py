@@ -99,8 +99,12 @@ class BookViewTest(TestCase):
 
 
 class IssueTest(TestCase):
+
+    def fine_per_day(self, price=1, days_spent=1):
+        fine = price * 0.1
+        return fine * days_spent
+
     def setUp(self):
-        self.fine_per_day = 100.00
 
         self.staff = Staff.objects.create_user(
             username="staff00001",
@@ -135,7 +139,9 @@ class IssueTest(TestCase):
         self.fine = 0.00
         if self.return_date > self.expected_date:
             self.fine = (self.return_date - self.expected_date).days
-        self.fine = self.fine_per_day * self.fine
+
+        self.fine = self.fine_per_day(price=self.pre_book.price,
+                                      days_spent=self.fine)
 
         self.pre_issue = Issue.objects.create(
             book=self.pre_book,
@@ -153,8 +159,7 @@ class IssueTest(TestCase):
             expected_date=self.expected_date)
 
         self.post_issue.close_issue(
-            returned_date=self.return_date,
-            fine_per_day=self.fine_per_day)
+            returned_date=self.return_date)
         self.post_issue.save()
 
     def tearDown(self):
@@ -183,7 +188,6 @@ class IssueTest(TestCase):
 
     def test_return_book(self):
         self.pre_issue.close_issue(
-            fine_per_day=self.fine_per_day,
             returned_date=self.return_date)
         self.pre_issue.save()
 
@@ -274,8 +278,7 @@ class IssueViewTest(TestCase):
             expected_date=self.expected_date)
 
         self.post_issue.close_issue(
-            returned_date=self.return_date,
-            fine_per_day=self.fine_per_day)
+            returned_date=self.return_date)
         self.post_issue.save()
 
         response = self.client.get(

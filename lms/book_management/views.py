@@ -1,5 +1,5 @@
 from book_management.models import Book, Issue
-from book_management.forms import BookForm, IssueForm
+from book_management.forms import BookForm, IssueForm,  ReturnBookForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 
@@ -41,19 +41,30 @@ class IssueBookView(CreateView):
     form_class = IssueForm
     template_name = 'books/issue-book.html'
 
+    def post(self, request):
+        form_class = IssueForm(request.POST)
+        if form_class.is_valid():
+            form_class.save()
+            return HttpResponseRedirect(reverse('view-issued-books'))
+        else:
+            return HttpResponseRedirect(reverse('issue-book'))
+
 
 class IssuedBooksView(View):
     def get(self,  request):
-        books = Issue.objects.filter(return_date=None)
-        context = dict(books=books)
+        rentals = Issue.objects.filter(return_date=None)
+        context = dict(rentals=rentals)
         template = loader.get_template('books/issued-books.html')
         return HttpResponse(template.render(context, request))
 
 
 class ReturnBookView(UpdateView):
     model = Issue
-    form_class = IssueForm
-    template_name = 'books/issue-book.html'
+    form_class = ReturnBookForm
+    template_name = 'books/return-book.html'
+
+    def get_success_url(self):
+        return reverse('view-issued-books')
 
 
 class UpdateBookView(View):

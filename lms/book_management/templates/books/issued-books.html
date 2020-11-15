@@ -1,44 +1,50 @@
 {% extends 'navbar.html' %} {% load crispy_forms_tags %} {% block content %}
-
+{%load humanize %}
 
 <div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-8">
-            <div class="card">
-                <div class="card-body py-2">
-                    <div class="row">
-                        <div class="col">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Name</th>
-                                        <th>Price</th>
-                                        <th>Genre</th>
-                                        <th><i class="fa fa-cog"></i></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Name</td>
-                                        <td>Sample</td>
-                                        <td>Disco light</td>
-                                        <td class="text-right">
-                                        <a href="{% url 'return-book' 1 %}"class="btn btn-sm btn-primary">return book</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer text-right bg-white py-1">
-
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-body py-2">
+          <div class="row">
+            <div class="col">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Genre</th>
+                    <th>Fine</th>
+                    <th><i class="fa fa-cog"></i></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rental in rentals %}
+                  <tr>
+                    <td>{{ rental.id }}</td>
+                    <td>{{ rental.book|title }}</td>
+                    <td>{{ rental.book.price|intcomma }}</td>
+                    <td>{{ rental.book.genre|title }}</td>
+                    <td>{{ rental.current_fine|intcomma }}</td>
+                    <td class="text-right">
+                      <a
+                        href="{% url 'return-book' rental.id %}"
+                        class="btn btn-sm btn-primary"
+                        >return book</a
+                      >
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
+          </div>
         </div>
-
+        <div class="card-footer text-right bg-white py-1"></div>
+      </div>
     </div>
+  </div>
 </div>
 
 {% endblock content %}
