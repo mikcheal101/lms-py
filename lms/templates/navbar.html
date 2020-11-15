@@ -1,5 +1,6 @@
+{% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block navbar %}
+{% block body %}
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">LMS</a>
@@ -71,4 +72,8 @@
 
     </div>
 </nav>
-{% endblock navbar %}
+
+{% block content %}
+{% endblock content %}
+
+{% endblock body %}
