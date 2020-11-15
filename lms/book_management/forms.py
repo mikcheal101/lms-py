@@ -1,7 +1,12 @@
+import datetime as dt
+
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from django import forms
-from book_management.models import Book, Issue
-from django.contrib.auth.models import User as Staff
 from django.contrib.auth.models import User as Customer
+from django.contrib.auth.models import User as Staff
+
+from book_management.models import Book, Issue
 
 
 class IssueForm(forms.ModelForm):
@@ -15,15 +20,27 @@ class IssueForm(forms.ModelForm):
     book = forms.ModelChoiceField(
         queryset=Book.objects.all())
 
+    issue_date = forms.DateField(
+        initial=dt.date.today(),
+        widget=forms.TextInput(attrs=dict(type='date')))
+
     class Meta:
         model = Issue
         fields = [
             'issue_date',
-            'expected_date',
-            'return_date',
-            'fine',
+            'staff',
             'customer',
             'book', ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Issue Book'))
+
+
+class ReturnBookForm(forms.Form):
+    pass
 
 
 class BookForm(forms.ModelForm):

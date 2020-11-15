@@ -56,6 +56,7 @@ class BookViewTest(TestCase):
 
     def test_no_book(self):
         response = self.client.get('/books/')
+        print(response.json, response.content)
         self.assertEqual(response.data, {'books', []})
 
     def test_read_book(self):

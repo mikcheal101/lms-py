@@ -1,53 +1,89 @@
-from book_management.models import Book
-from book_management.forms import BookForm
-from django.http import HttpResponse
+from book_management.models import Book, Issue
+from book_management.forms import BookForm, IssueForm
+from django.http import HttpResponse, HttpResponseRedirect
+from django.template import loader
 
-from django.views.generic.edit import UpdateView
-from django.views.generic.detail import DetailView
 from django.views import View
+from django.urls import reverse
+from django.views.generic import CreateView, UpdateView
 
 
 class BooksView(View):
 
     def get(self, request):
-        output = Book.objects.all()
-        return HttpResponse(output)
+        books = Book.objects.all()
+        template = loader.get_template('books/books.html')
+        context = dict(books=books)
+        return HttpResponse(template.render(context, request))
+
+
+class AddBookView(View):
+
+    def get(self,  request):
+        book_form = BookForm()
+        template = loader.get_template('books/add-book.html')
+        context = dict(book_form=book_form)
+        return HttpResponse(template.render(context, request))
 
     def post(self, request):
+        book_form = BookForm(request.POST)
+        if book_form.is_valid():
+            book_form.save()
+            return HttpResponseRedirect(reverse('view-books'))
+        else:
+            template = loader.get_template('books/add-book.html')
+            context = dict(book_form=book_form)
+            return HttpResponse(template.render(context, request))
+
+
+class IssueBookView(CreateView):
+    model = Issue
+    form_class = IssueForm
+    template_name = 'books/issue-book.html'
+
+
+class IssuedBooksView(View):
+    def get(self,  request):
+        books = Issue.objects.filter(return_date=None)
+        context = dict(books=books)
+        template = loader.get_template('books/issued-books.html')
+        return HttpResponse(template.render(context, request))
+
+
+class ReturnBookView(UpdateView):
+    model = Issue
+    form_class = IssueForm
+    template_name = 'books/issue-book.html'
+
+
+class UpdateBookView(View):
+
+    def put(self, request, book_id=None):
+        book = Book.objects.none()
+        book_form = BookForm()
         try:
-            form = BookForm(request.data)
-            if form.is_valid():
-                form.save()
-            return HttpResponse(form.data)
-        except Exception:
-            return HttpResponse(None)
+            book = Book.objects.get(pk=book_id)
+            book_form = BookForm(request.PUT, instance=book)
+            if book_form.is_valid():
+                book_form.save()
+                return HttpResponseRedirect(reverse('view-books'))
+        except Book.DoesNotExist:
+            pass
+
+        template = loader.get_template('books/book.html')
+        context = dict(book_form=book_form)
+        return HttpResponse(template.render(context, request))
 
 
 class BookView(View):
 
     def get(self, request, book_id=None):
-        pass
+        book = Book.objects.none()
+        try:
+            book = Book.objects.get(pk=book_id)
+        except Book.DoesNotExist:
+            pass
 
-    def put(self, request, book_id=None):
-        pass
-
-
-# def books(request):
-#     output = Book.objects.all()
-#     return HttpResponse(output)
-
-
-# def book(request, book_id=None):
-#     try:
-#         output = Book.objects.get(pk=book_id)
-#         return HttpResponse(output)
-#     except Exception:
-#         return None
-
-
-# def update_book(request, book_id):
-#     try:
-#         output = Book.objects.get(pk=book_id)
-#         return HttpResponse(output)
-#     except Exception:
-#         return None
+        template = None
+        context = dict(book=book)
+        return HttpResponse(template.render(context, request))
